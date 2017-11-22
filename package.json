@@ -1,0 +1,27 @@
+{
+  "name": "ravello-js",
+  "version": "1.0.1",
+  "description": "Javascript bindings for Ravello API",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/f5itc/ravello-js.git"
+  },
+  "keywords": [
+    "ravello"
+  ],
+  "author": "Thomas Williams <t.williams@f5.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/f5itc/ravello-js/issues"
+  },
+  "homepage": "https://github.com/f5itc/ravello-js#readme",
+  "devDependencies": {
+    "jest": "^21.2.1",
+    "nock": "^9.0.25"
+  },
+  "dependencies": {}
+}
