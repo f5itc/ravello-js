@@ -107,7 +107,7 @@ module.exports.isApplicationPublished = {
 
 module.exports.listApplicationPublishLocations = {
   method: GET,
-  path:   (appId) => `/applications/${appId}/publishLocations`,
+  path:   (appId) => `/applications/${appId}/findPublishLocations`,
 };
 
 module.exports.listApplications = {
