@@ -1,6 +1,7 @@
 // src/waiters
 
 const { vmStates } = require('./constants');
+const { getVMState } = require('./methods');
 
 const maxTries = 5;
 const retryInterval = 15;
@@ -20,7 +21,7 @@ const waitForState = ({ method, methodArgs, numTries=0, targetId, targetName }) 
     }
 
     console.log(`${targetName} ${targetId} is in state ${state} -- Retrying for state ${targetState}`);
-    return waitForState({ method, methodArgs, numTries, targetId, targetName });
+    return setTimeout(waitForState, 15 * 1000, { method, methodArgs, numTries, targetId, targetName });
   })
 
 );
