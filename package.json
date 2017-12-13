@@ -21,7 +21,7 @@
   "homepage": "https://github.com/f5itc/ravello-js#readme",
   "devDependencies": {
     "jest": "^21.2.1",
-    "nock": "^9.0.25"
+    "nock": "^9.1.4"
   },
   "dependencies": {}
 }
