@@ -22,6 +22,11 @@ let cookie;
 
 const ravelloRequest = ({ body, headers={}, method, path }) => new Promise((resolve, reject) => {
 
+  if (typeof path === 'function') {
+    if (typeof body !== 'object') { throw new Error('Body must be an object'); }
+    path = path(body);
+  }
+
   const opts = {
     method,
     hostname: API_HOST,
@@ -43,15 +48,24 @@ const ravelloRequest = ({ body, headers={}, method, path }) => new Promise((reso
 
       try {
         if (responseData.length > 0) {
-          responseData = JSON.parse(responseData);
+          try {
+            responseData = JSON.parse(responseData);
+          }
+          catch(e) {
+            console.log('Could not parse responseData:', e);
+          }
         }
 
         if (!res.statusCode.toString().startsWith('2')) {
-          reject(responseData || res.statusCode);
+          const apiError = new Error();
+          apiError.message = res.statusMessage;
+          apiError.code = res.statusCode;
+          apiError.data = responseData;
+          reject(apiError);
         }
 
         else {
-          resolve(responseData || res.statusCode);
+          resolve(responseData || true);
         }
       }
 
@@ -94,7 +108,7 @@ const request = (opts) => {
     ravelloRequest(opts).catch((err) => {
 
       // If unauthorized error, attempt to re-authenticate
-      if (err === 401) {
+      if (err.statusCode === 401) {
         return authenticate().then(() => ravelloRequest(opts));
       }
 
