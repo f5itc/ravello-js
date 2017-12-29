@@ -9,7 +9,10 @@ const DOMAIN   = process.env.RAVELLO_DOMAIN;
 const USERNAME = process.env.RAVELLO_USERNAME;
 const PASSWORD = process.env.RAVELLO_PASSWORD;
 
-const baseHeaders = { Accept: 'application/json' };
+const baseHeaders = {
+  'Content-Type': 'application/json',
+  Accept: 'application/json',
+};
 
 const makeAuthHeader = (domain, user, pass) => ({
   Authorization: 'Basic: ' + new Buffer(`${domain}/${user}:${pass}`).toString('base64'),
@@ -28,6 +31,7 @@ const ravelloRequest = ({ body, headers={}, method, path }) => new Promise((reso
   };
 
   if (cookie) { opts.headers['Cookie'] = cookie; }
+  if (body) { opts.headers['Content-Length'] = (JSON.stringify(body)).length }
 
   const req = https.request(opts, (res) => {
     let responseData = '';
@@ -58,7 +62,7 @@ const ravelloRequest = ({ body, headers={}, method, path }) => new Promise((reso
 
   req.on('error', (err) => { reject(err); });
 
-  if (body) { req.write(body); }
+  if (body) { req.write(JSON.stringify(body)); }
 
   req.end();
 });
