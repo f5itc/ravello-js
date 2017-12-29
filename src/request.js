@@ -97,9 +97,6 @@ const checkAuthentication = () => new Promise((resolve, reject) => {
 
 // TODO: add retry / backoff for retryable errors
 const request = (opts) => {
-  if(typeof opts.path === 'function') {
-    opts.path = opts.path.apply(null, opts.pathArgs);
-  }
 
   // Ensure we have authentication
   return checkAuthentication().then(() => (
