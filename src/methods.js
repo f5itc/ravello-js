@@ -75,18 +75,13 @@ module.exports.getApplicationBillingDetail = {
   path:   (appId) => `/applications/${appId}/billing`,
 };
 
-module.exports.getApplicationCost = {
-  method: GET,
-  path:   (appId) => `/applications/${appId}/calcPrice`,
-};
-
 module.exports.getApplicationDeploymentCost = {
-  method: GET,
+  method: POST,
   path:   (appId) => `/applications/${appId};deployment/calcPrice`,
 };
 
 module.exports.getApplicationDesignCost = {
-  method: GET,
+  method: POST,
   path:   (appId) => `/applications/${appId};design/calcPrice`,
 };
 
@@ -102,12 +97,12 @@ module.exports.getApplicationTask = {
 
 module.exports.isApplicationPublished = {
   method: GET,
-  path:   (appId) => `/application/${appId}/isPublished`,
+  path:   (appId) => `/applications/${appId}/isPublished`,
 };
 
 module.exports.listApplicationPublishLocations = {
-  method: GET,
-  path:   (appId) => `/applications/${appId}/publishLocations`,
+  method: POST,
+  path:   (appId) => `/applications/${appId}/findPublishLocations`,
 };
 
 module.exports.listApplications = {

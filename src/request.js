@@ -9,7 +9,10 @@ const DOMAIN   = process.env.RAVELLO_DOMAIN;
 const USERNAME = process.env.RAVELLO_USERNAME;
 const PASSWORD = process.env.RAVELLO_PASSWORD;
 
-const baseHeaders = { Accept: 'application/json' };
+const baseHeaders = {
+  'Content-Type': 'application/json',
+  Accept: 'application/json',
+};
 
 const makeAuthHeader = (domain, user, pass) => ({
   Authorization: 'Basic: ' + new Buffer(`${domain}/${user}:${pass}`).toString('base64'),
@@ -28,6 +31,7 @@ const ravelloRequest = ({ body, headers={}, method, path }) => new Promise((reso
   };
 
   if (cookie) { opts.headers['Cookie'] = cookie; }
+  if (body) { opts.headers['Content-Length'] = (JSON.stringify(body)).length }
 
   const req = https.request(opts, (res) => {
     let responseData = '';
@@ -58,7 +62,7 @@ const ravelloRequest = ({ body, headers={}, method, path }) => new Promise((reso
 
   req.on('error', (err) => { reject(err); });
 
-  if (body) { req.write(body); }
+  if (body) { req.write(JSON.stringify(body)); }
 
   req.end();
 });
@@ -78,10 +82,13 @@ const checkAuthentication = () => new Promise((resolve, reject) => {
 });
 
 // TODO: add retry / backoff for retryable errors
-const request = (opts) => (
+const request = (opts) => {
+  if(typeof opts.path === 'function') {
+    opts.path = opts.path.apply(null, opts.pathArgs);
+  }
 
   // Ensure we have authentication
-  checkAuthentication().then(() => (
+  return checkAuthentication().then(() => (
 
     // Execute request
     ravelloRequest(opts).catch((err) => {
@@ -94,8 +101,8 @@ const request = (opts) => (
       console.log('Unhandled error:', err.message);
       throw err;
     })
-  ))
+  ));
 
-);
+};
 
 module.exports = request;
