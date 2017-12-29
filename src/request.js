@@ -82,10 +82,13 @@ const checkAuthentication = () => new Promise((resolve, reject) => {
 });
 
 // TODO: add retry / backoff for retryable errors
-const request = (opts) => (
+const request = (opts) => {
+  if(typeof opts.path === 'function') {
+    opts.path = opts.path.apply(null, opts.pathArgs);
+  }
 
   // Ensure we have authentication
-  checkAuthentication().then(() => (
+  return checkAuthentication().then(() => (
 
     // Execute request
     ravelloRequest(opts).catch((err) => {
@@ -98,8 +101,8 @@ const request = (opts) => (
       console.log('Unhandled error:', err.message);
       throw err;
     })
-  ))
+  ));
 
-);
+};
 
 module.exports = request;

@@ -4,7 +4,7 @@ const methods = require('./methods');
 const request = require('./request');
 const waiters = require('./waiters');
 
-const composeMethod = ({ method, path }) => (body) => request({ path, method, body });
+const composeMethod = ({ method, path }) => (body, pathArgs) => request({ path, pathArgs, method, body });
 
 const builtMethods = {};
 
