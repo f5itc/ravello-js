@@ -39,18 +39,20 @@ test('create application', () => {
 
 test('create application documentation', () => {
   const payload = {
+    appId,
     value: 'Some documentation'
   };
 
   n.makeRavelloPOSTNock(`${basePath}/${appId}/documentation`, payload, payload);
 
-  return r.createApplicationDocumentation(payload, [ appId ]).then((response) => {
+  return r.createApplicationDocumentation(payload).then((response) => {
     expect(response).toEqual(payload);
   });
 });
 
 test('create application task', () => {
   const payload = {
+    appId,
     action: 'START'
   };
 
@@ -70,7 +72,7 @@ test('create application task', () => {
 
   n.makeRavelloPOSTNock(`${basePath}/${appId}/tasks`, payload, response);
 
-  return r.createApplicationTask(payload, [ appId ]).then((response) => {
+  return r.createApplicationTask(payload).then((response) => {
     expect(response).toEqual(response);
   });
 });
@@ -78,55 +80,58 @@ test('create application task', () => {
 test('delete all application tasks', () => {
   n.makeRavelloDELETENock(`${basePath}/${appId}/tasks`);
 
-  return r.deleteAllApplicationTasks(null, [ appId ]).then((response) => {
-    expect(response).toEqual(204);
+  return r.deleteAllApplicationTasks({ appId }).then((response) => {
+    expect(response).toEqual(true);
   });
 });
 
 test('delete application', () => {
   n.makeRavelloDELETENock(`${basePath}/${appId}`);
 
-  return r.deleteApplication(null, [ appId ]).then((response) => {
-    expect(response).toEqual(204);
+  return r.deleteApplication({ appId }).then((response) => {
+    expect(response).toEqual(true);
   });
 });
 
 test('get application', () => {
   n.makeRavelloGETNock(`${basePath}/${appId}`, f.baseApplication);
 
-  return r.getApplication(null, [ appId ]).then((response) => {
+  return r.getApplication({ appId }).then((response) => {
     expect(response).toEqual(f.baseApplication);
   });
 });
 
 test('get application deployment cost', () => {
-  n.makeRavelloPOSTNock(`${basePath}/${appId};deployment/calcPrice`, '', f.deploymentPrice);
+  const payload = { appId };
+  n.makeRavelloPOSTNock(`${basePath}/${appId};deployment/calcPrice`, payload, f.deploymentPrice);
 
-  return r.getApplicationDeploymentCost(null, [ appId ]).then((response) => {
+  return r.getApplicationDeploymentCost(payload).then((response) => {
     expect(response).toEqual(f.deploymentPrice);
   });
 });
 
 test('get application design cost', () => {
   const payload = {
+    appId,
     "optimizationLevel" : "PERFORMANCE_OPTIMIZED"
   };
 
   n.makeRavelloPOSTNock(`${basePath}/${appId};design/calcPrice`, payload, f.designPrice);
 
-  return r.getApplicationDesignCost(payload, [ appId ]).then((response) => {
+  return r.getApplicationDesignCost(payload).then((response) => {
     expect(response).toEqual(f.designPrice);
   });
 });
 
 test('get application documentation', () => {
   const docs = {
+    appId,
     value: 'Some documentation'
   };
 
   n.makeRavelloGETNock(`${basePath}/${appId}/documentation`, docs);
 
-  return r.getApplicationDocumentation(null, [ appId ]).then((response) => {
+  return r.getApplicationDocumentation({ appId }).then((response) => {
     expect(response).toEqual(docs);
   });
 });
@@ -134,7 +139,7 @@ test('get application documentation', () => {
 test('get application task', () => {
   n.makeRavelloGETNock(`${basePath}/${appId}/tasks/${f.task.id}`, f.task);
 
-  return r.getApplicationTask(null, [ appId, f.task.id ]).then((response) => {
+  return r.getApplicationTask({ appId, taskId: f.task.id }).then((response) => {
     expect(response).toEqual(f.task);
   });
 });
@@ -144,15 +149,15 @@ test('is application published', () => {
 
   n.makeRavelloGETNock(`${basePath}/${appId}/isPublished`, published);
 
-  return r.isApplicationPublished(null, [ appId ]).then((response) => {
+  return r.isApplicationPublished({ appId }).then((response) => {
     expect(response).toEqual(published);
   });
 });
 
 test('list application publish locations', () => {
-  n.makeRavelloPOSTNock(`${basePath}/${appId}/findPublishLocations`, '', f.publishLocations);
+  n.makeRavelloPOSTNock(`${basePath}/${appId}/findPublishLocations`, { appId }, f.publishLocations);
 
-  return r.listApplicationPublishLocations(null, [ appId ]).then((response) => {
+  return r.listApplicationPublishLocations({ appId }).then((response) => {
     expect(response).toEqual(f.publishLocations);
   });
 });
@@ -160,29 +165,30 @@ test('list application publish locations', () => {
 test('list application tasks', () => {
   n.makeRavelloGETNock(`${basePath}/${appId}/tasks`, [f.task]);
 
-  return r.listApplicationTasks(null, [ appId ]).then((response) => {
+  return r.listApplicationTasks({ appId }).then((response) => {
     expect(response).toEqual([f.task]);
   });
 });
 
 test('publish application', () => {
   const payload = {
+    appId,
     "optimizationLevel": "PERFORMANCE_OPTIMIZED",
   };
 
   n.makeRavelloPOSTNock(`${basePath}/${appId}/publish`, payload, '');
 
-  return r.publishApplication(payload, [ appId ]).then((response) => {
-    expect(response).toEqual(201);
+  return r.publishApplication(payload).then((response) => {
+    expect(response).toEqual(true);
   });
 });
 
 test('publish application updates', () => {
   const res = { "completedSuccessfuly": "true" };
 
-  n.makeRavelloPOSTNock(`${basePath}/${appId}/publishUpdates`, '', res);
+  n.makeRavelloPOSTNock(`${basePath}/${appId}/publishUpdates`, { appId }, res);
 
-  return r.publishApplicationUpdates(null, [ appId ]).then((response) => {
+  return r.publishApplicationUpdates({ appId }).then((response) => {
     expect(response).toEqual(res);
   });
 });
@@ -190,9 +196,9 @@ test('publish application updates', () => {
 test('reset application disks', () => {
   const res = { "completedSuccessfuly": "true" };
 
-  n.makeRavelloPOSTNock(`${basePath}/${appId}/resetDisks`, '', res);
+  n.makeRavelloPOSTNock(`${basePath}/${appId}/resetDisks`, { appId }, res);
 
-  return r.resetApplicationDisks(null, [ appId ]).then((response) => {
+  return r.resetApplicationDisks({ appId }).then((response) => {
     expect(response).toEqual(res);
   });
 });
@@ -200,21 +206,22 @@ test('reset application disks', () => {
 test('restart application', () => {
   const res = { "completedSuccessfuly": "true" };
 
-  n.makeRavelloPOSTNock(`${basePath}/${appId}/restart`, '', res);
+  n.makeRavelloPOSTNock(`${basePath}/${appId}/restart`, { appId }, res);
 
-  return r.restartApplication(null, [ appId ]).then((response) => {
+  return r.restartApplication({ appId }).then((response) => {
     expect(response).toEqual(res);
   });
 });
 
 test('set application expiration', () => {
   const payload = {
+    appId,
     "expirationFromNowSeconds": 7200
   };
 
   n.makeRavelloPOSTNock(`${basePath}/${appId}/setExpiration`, payload, 1514516728800);
 
-  return r.setApplicationExpiration(payload, [ appId ]).then((response) => {
+  return r.setApplicationExpiration(payload).then((response) => {
     expect(response).toEqual(1514516728800);
   });
 });
@@ -222,9 +229,9 @@ test('set application expiration', () => {
 test('start application', () => {
   const res = { "completedSuccessfuly": "true" };
 
-  n.makeRavelloPOSTNock(`${basePath}/${appId}/start`, '', res);
+  n.makeRavelloPOSTNock(`${basePath}/${appId}/start`, { appId }, res);
 
-  return r.startApplication(null, [ appId ]).then((response) => {
+  return r.startApplication({ appId }).then((response) => {
     expect(response).toEqual(res);
   });
 });
@@ -232,31 +239,44 @@ test('start application', () => {
 test('stop application', () => {
   const res = { "completedSuccessfuly": "true" };
 
-  n.makeRavelloPOSTNock(`${basePath}/${appId}/stop`, '', res);
+  n.makeRavelloPOSTNock(`${basePath}/${appId}/stop`, { appId }, res);
 
-  return r.stopApplication(null, [ appId ]).then((response) => {
+  return r.stopApplication({ appId }).then((response) => {
     expect(response).toEqual(res);
   });
 });
 
 xtest('update application', () => {
+  nock.recorder.rec();
+
   const payload = {
+    appId: 94603906,
     name: 'Updated Application',
     design: {},
   };
 
   const response = { ...f.baseApplication, name: 'Updated Application', version: 2 };
 
-  n.makeRavelloPUTNock(basePath, payload, response);
+  n.makeRavelloPUTNock(`${basePath}/${appId}`, payload, response);
 
-  return r.updateApplication(payload, [ appId ]).then((response) => {
+  return r.updateApplication(payload).then((response) => {
     expect(response).toEqual({ ...f.baseApplication, version: 2 });
   });
 });
 
 xtest('update application documentation', () => {
+  // nock.recorder.rec();
 
-  return r.updateApplicationDocumentation().then((response) => {
+  const payload = {
+    appId: 94603906,
+    value: 'Some updated documentation'
+  };
+
+  const response = { value: 'Some updated documentation' };
+
+  n.makeRavelloPUTNock(`${basePath}/${appId}/documentation`, payload, response);
+
+  return r.updateApplicationDocumentation(payload).then((response) => {
     expect(response).toEqual([f.baseApplication]);
   });
 });
