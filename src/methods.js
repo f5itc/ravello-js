@@ -999,6 +999,11 @@ module.exports.getVMVMCURL = {
   path:   ({ appId, vmId }) => `/applications/${appId}/vms/${vmId}/vncUrl`,
 };
 
+module.exports.executeVMsAction = {
+  method: POST,
+  path:   ({ action, appId, vmId }) => `/applications/${appId}/vms/${vmId}/${action}`,
+};
+
 module.exports.poweroffVM = {
   method: POST,
   path:   ({ appId, vmId }) => `/applications/${appId}/vms/${vmId}/${POWEROFF}`,
