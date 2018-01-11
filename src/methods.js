@@ -152,7 +152,7 @@ module.exports.stopApplication = {
 
 module.exports.updateApplication = {
   method: PUT,
-  path:   ({ appId }) => `/applications/${appId}`,
+  path:   ({ application }) => `/applications/${application.id}`,
 };
 
 module.exports.updateApplicationDocumentation = {
