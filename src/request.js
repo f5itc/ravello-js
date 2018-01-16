@@ -20,8 +20,7 @@ const makeAuthHeader = (domain, user, pass) => ({
 
 let cookie;
 
-const ravelloRequest = ({ body, headers={}, method, path }) => new Promise((resolve, reject) => {
-
+const ravelloRequest = ({ body, headers={}, method, path, conf: { Promise } }) => new Promise((resolve, reject) => {
   if (typeof path === 'function') {
     if (typeof body !== 'object') { throw new Error('Body must be an object'); }
     path = path(body);
@@ -81,8 +80,9 @@ const ravelloRequest = ({ body, headers={}, method, path }) => new Promise((reso
   req.end();
 });
 
-const authenticate = () => (
+const authenticate = (conf) => (
   ravelloRequest({
+    conf,
     headers: makeAuthHeader(DOMAIN, USERNAME, PASSWORD),
     method:  'POST',
     path:    '/login',
@@ -90,16 +90,16 @@ const authenticate = () => (
 );
 
 // TODO: check cookie expiration
-const checkAuthentication = () => new Promise((resolve, reject) => {
+const checkAuthentication = (conf) => new conf.Promise((resolve, reject) => {
   if (cookie) { return resolve(true); }
-  return resolve(authenticate());
+  return resolve(authenticate(conf));
 });
 
 // TODO: add retry / backoff for retryable errors
 const request = (opts) => {
 
   // Ensure we have authentication
-  return checkAuthentication().then(() => (
+  return checkAuthentication(opts.conf).then(() => (
 
     // Execute request
     ravelloRequest(opts).catch((err) => {
