@@ -1,6 +1,7 @@
 // src/request
 const https = require('https');
 const join  = require('path').join;
+const conf  = require('./conf').conf;
 
 const API_HOST = 'cloud.ravellosystems.com';
 const API_PATH = '/api/v1';
@@ -20,8 +21,7 @@ const makeAuthHeader = (domain, user, pass) => ({
 
 let cookie;
 
-const ravelloRequest = ({ body, headers={}, method, path }) => new Promise((resolve, reject) => {
-
+const ravelloRequest = ({ body, headers={}, method, path }) => new conf.Promise((resolve, reject) => {
   if (typeof path === 'function') {
     if (typeof body !== 'object') { throw new Error('Body must be an object'); }
     path = path(body);
@@ -90,7 +90,7 @@ const authenticate = () => (
 );
 
 // TODO: check cookie expiration
-const checkAuthentication = () => new Promise((resolve, reject) => {
+const checkAuthentication = () => new conf.Promise((resolve, reject) => {
   if (cookie) { return resolve(true); }
   return resolve(authenticate());
 });
