@@ -1,5 +1,5 @@
 // src/waiters
-
+const conf  = require('./conf').conf;
 const request = require('./request');
 const { vmStates } = require('./constants');
 const { getVMState, isApplicationPublished } = require('./methods');
@@ -8,7 +8,7 @@ const composeMethod = ({ method, path }) => (body) => request({ path, method, bo
 
 const waitFor = ({ method, methodArgs, maxTries=5, retryInterval=15, targetName, targetId, targetAttribute, expectedValue }) => {
 
-  return new Promise((resolve, reject) => {
+  return new conf.Promise((resolve, reject) => {
     const retry = (i) => {
       composeMethod(method)(methodArgs)
         .then((response) => {
