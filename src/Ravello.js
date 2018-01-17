@@ -3,16 +3,10 @@
 const methods = require('./methods');
 const request = require('./request');
 const waiters = require('./waiters');
-
-// Set default configuration and provide a method for overriding
-const conf = {
-  Promise: Promise,
-};
-
-const configure = (newConf) => Object.assign(conf, newConf);
+const configure = require('./conf').configure;
 
 // Compose library methods
-const composeMethod = ({ method, path }) => (body) => request({ path, method, body, conf });
+const composeMethod = ({ method, path }) => (body) => request({ path, method, body });
 
 const builtMethods = {};
 
