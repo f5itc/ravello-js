@@ -6,7 +6,7 @@ const { getVMState, isApplicationPublished } = require('./methods');
 
 const composeMethod = ({ method, path }) => (body) => request({ path, method, body });
 
-const waitFor = ({ method, methodArgs, maxTries=5, retryInterval=15, targetName, targetId, targetAttribute, expectedValue }, getPromise) => {
+const waitFor = ({ method, methodArgs, maxTries=5, retryInterval=15, targetName, targetId, targetAttribute, expectedValue }) => {
 
   return new Promise((resolve, reject) => {
     const retry = (i) => {
