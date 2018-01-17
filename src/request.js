@@ -54,6 +54,8 @@ const ravelloRequest = ({ body, headers={}, method, path }) => new conf.Promise(
           catch(e) {
             console.log('Could not parse responseData:', e);
           }
+
+          console.log(`${opts.path} - ${responseData}`)
         }
 
         if (!res.statusCode.toString().startsWith('2')) {
