@@ -95,7 +95,6 @@ const authenticate = () => (
   })
 );
 
-// TODO: check cookie expiration
 const checkAuthentication = () => new conf.Promise((resolve, reject) => {
   if (cookie) { return resolve(true); }
   return resolve(authenticate());
@@ -112,6 +111,7 @@ const request = (opts) => {
 
       // If unauthorized error, attempt to re-authenticate
       if (err.statusCode === 401) {
+        cookie = null;
         return authenticate().then(() => ravelloRequest(opts));
       }
 
