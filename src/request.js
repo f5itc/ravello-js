@@ -9,6 +9,7 @@ const API_PATH = '/api/v1';
 const DOMAIN   = process.env.RAVELLO_DOMAIN;
 const USERNAME = process.env.RAVELLO_USERNAME;
 const PASSWORD = process.env.RAVELLO_PASSWORD;
+const DEBUG    = process.env.RAVELLO_DEV_MODE_ENABLED;
 
 const baseHeaders = {
   'Content-Type': 'application/json',
@@ -50,12 +51,15 @@ const ravelloRequest = ({ body, headers={}, method, path }) => new conf.Promise(
         if (responseData.length > 0) {
           try {
             responseData = JSON.parse(responseData);
+
+            if (DEBUG) {
+              console.log(`PATH - ${opts.path}`)
+              conf.Logger(responseData);
+            }
           }
           catch(e) {
             console.log('Could not parse responseData:', e);
           }
-
-          console.log(`${opts.path} - ${responseData}`)
         }
 
         if (!res.statusCode.toString().startsWith('2')) {
@@ -91,7 +95,6 @@ const authenticate = () => (
   })
 );
 
-// TODO: check cookie expiration
 const checkAuthentication = () => new conf.Promise((resolve, reject) => {
   if (cookie) { return resolve(true); }
   return resolve(authenticate());
@@ -108,6 +111,7 @@ const request = (opts) => {
 
       // If unauthorized error, attempt to re-authenticate
       if (err.statusCode === 401) {
+        cookie = null;
         return authenticate().then(() => ravelloRequest(opts));
       }
 
