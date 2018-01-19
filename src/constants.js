@@ -40,3 +40,16 @@ const vmStates = module.exports.vmStates = {
   WAITING_TO_START: 'WAITING_TO_START',
   WAITING_TO_STOP:  'WAITING_TO_STOP',
 };
+
+const loadingStatuses = module.exports.loadingStatuses = {
+  DELETED:         'DELETED',
+  DELETING:        'DELETING',
+  DONE:            'DONE',
+  ERROR:           'ERROR',
+  ERROR_UPLOADING: 'ERROR_UPLOADING',
+  PARSING:         'PARSING',
+  PAUSED:          'PAUSED',
+  SAVING:          'SAVING',
+  UNKNOWN:         'UNKNOWN',
+  UPLOADING:       'UPLOADING',
+};
