@@ -57,9 +57,9 @@ const waitForPublished = module.exports.waitForPublished = (appId) => (
   })
 );
 
-const waitForImageAvailable = module.exports.waitForImageAvailable = (imageId) => (
+const waitForImageState = module.exports.waitForImageState = (imageId, expectedValue) => (
   waitFor({
-    expectedValue:   loadingStatuses.DONE,
+    expectedValue,
     method:          getImage,
     methodArgs:      { imageId },
     targetAttribute: 'loadingStatus',
