@@ -1,8 +1,8 @@
 // src/waiters
 const conf  = require('./conf').conf;
 const request = require('./request');
-const { vmStates } = require('./constants');
-const { getVMState, isApplicationPublished } = require('./methods');
+const { vmStates, loadingStatuses } = require('./constants');
+const { getVMState, getImage, isApplicationPublished } = require('./methods');
 
 const composeMethod = ({ method, path }) => (body) => request({ path, method, body });
 
@@ -15,7 +15,7 @@ const waitFor = ({ method, methodArgs, maxTries=5, retryInterval=15, targetName,
           const attr = targetAttribute ? response[targetAttribute] : response;
 
           if (attr === expectedValue) {
-            return resolve();
+            return resolve(response);
           }
 
           console.log(`${targetName} ${targetId} is in condition ${attr} [ Attempt # ${i} ]`);
@@ -54,5 +54,16 @@ const waitForPublished = module.exports.waitForPublished = (appId) => (
     targetName: 'Application',
     targetAttribute: 'value',
     expectedValue: true,
+  })
+);
+
+const waitForImageAvailable = module.exports.waitForImageAvailable = (imageId) => (
+  waitFor({
+    expectedValue:   loadingStatuses.DONE,
+    method:          getImage,
+    methodArgs:      { imageId },
+    targetAttribute: 'loadingStatus',
+    targetId:        imageId,
+    targetName:      'Image',
   })
 );
