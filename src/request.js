@@ -3,6 +3,7 @@ const https = require('https');
 const join  = require('path').join;
 const conf  = require('./conf').conf;
 const parseJSON = require('../lib/json_parse');
+const handleError = require('./errors').handleError;
 
 const API_HOST = 'cloud.ravellosystems.com';
 const API_PATH = '/api/v1';
@@ -48,42 +49,39 @@ const ravelloRequest = ({ body, headers={}, method, path }) => new conf.Promise(
     res.on('end', () => {
       if (res.headers['set-cookie']) { cookie = res.headers['set-cookie'] }
 
-      try {
-        if (responseData.length > 0) {
-          try {
-            responseData = parseJSON(responseData);
-
-            if (DEBUG) {
-              console.log(`PATH - ${opts.path}`)
-              conf.Logger(responseData);
-            }
-          }
-          catch(e) {
-            console.log('Could not parse responseData:', e);
-          }
+      if (responseData.length > 0) {
+        try {
+          responseData = parseJSON(responseData);
         }
-
-        if (!res.statusCode.toString().startsWith('2')) {
-          const apiError = new Error();
-          apiError.message = res.statusMessage;
-          apiError.code = res.statusCode;
-          apiError.data = responseData;
-          reject(apiError);
-        }
-
-        else {
-          resolve(responseData || true);
+        catch(e) {
+          console.log('Could not parse responseData:', e);
         }
       }
 
-      catch(e) { reject(e); }
+      // On response error, log and reject
+      const err = handleError(res, responseData);
+
+      if (err) {
+        conf.Logger({ level: 'ERROR', type: 'response', err, body: responseData, headers: res.headers });
+        return reject(err);
+      }
+
+      // On successful response, log and resolve
+      conf.Logger({ level: 'INFO', type: 'response', body: responseData, headers: res.headers });
+      return resolve(responseData || true);
     });
 
   });
 
-  req.on('error', (err) => { reject(err); });
-
   if (body) { req.write(JSON.stringify(body)); }
+
+  // Log request
+  conf.Logger(Object.assign({ level: 'INFO', type: 'request', body }, opts));
+
+  req.on('error', (err) => {
+    conf.Logger(Object.assign({ level: 'ERROR', type: 'request', err }, opts));
+    reject(err);
+  });
 
   req.end();
 });
