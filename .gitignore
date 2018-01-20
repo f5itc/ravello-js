@@ -1,1 +1,8 @@
 node_modules/
+*.bak
+*.swp
+*.tmp
+*.log
+*.debug
+*.out
+*.cap
