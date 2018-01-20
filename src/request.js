@@ -2,6 +2,7 @@
 const https = require('https');
 const join  = require('path').join;
 const conf  = require('./conf').conf;
+const parseJSON = require('../lib/json_parse');
 
 const API_HOST = 'cloud.ravellosystems.com';
 const API_PATH = '/api/v1';
@@ -50,7 +51,7 @@ const ravelloRequest = ({ body, headers={}, method, path }) => new conf.Promise(
       try {
         if (responseData.length > 0) {
           try {
-            responseData = JSON.parse(responseData);
+            responseData = parseJSON(responseData);
 
             if (DEBUG) {
               console.log(`PATH - ${opts.path}`)
