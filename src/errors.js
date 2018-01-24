@@ -1,7 +1,7 @@
 // src/errors
 
 // TODO: test for presence of configuration errors in app JSON
-const hasError = (res, responseData) => (
+const hasError = (res) => (
   res.headers['error-code'] || !res.statusCode.toString().startsWith('2')
 );
 
