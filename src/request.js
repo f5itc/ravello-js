@@ -3,7 +3,9 @@ const https = require('https');
 const join  = require('path').join;
 const conf  = require('./conf').conf;
 const parseJSON = require('../lib/json_parse');
-const handleError = require('./errors').handleError;
+
+const RavelloError = require('./errors').RavelloError;
+const hasError = require('./errors').hasError;
 
 const API_HOST = 'cloud.ravellosystems.com';
 const API_PATH = '/api/v1';
@@ -59,9 +61,8 @@ const ravelloRequest = ({ body, headers={}, method, path }) => new conf.Promise(
       }
 
       // On response error, log and reject
-      const err = handleError(res, responseData);
-
-      if (err) {
+      if (hasError(res)) {
+        const err = new RavelloError({ res, responseData });
         conf.Logger({ level: 'ERROR', type: 'response', err, body: responseData, headers: res.headers });
         return reject(err);
       }
@@ -78,6 +79,7 @@ const ravelloRequest = ({ body, headers={}, method, path }) => new conf.Promise(
   // Log request
   conf.Logger(Object.assign({ level: 'INFO', type: 'request', body }, opts));
 
+  // On request error, log and reject
   req.on('error', (err) => {
     conf.Logger(Object.assign({ level: 'ERROR', type: 'request', err }, opts));
     reject(err);
@@ -100,25 +102,26 @@ const checkAuthentication = () => new conf.Promise((resolve, reject) => {
 });
 
 // TODO: add retry / backoff for retryable errors
-const request = (opts) => {
+const request = (opts) => (
 
   // Ensure we have authentication
-  return checkAuthentication().then(() => (
+  checkAuthentication().then(() => (
 
     // Execute request
     ravelloRequest(opts).catch((err) => {
 
+
       // If unauthorized error, attempt to re-authenticate
-      if (err.statusCode === 401) {
+      if (err.code === 401) {
         cookie = null;
         return authenticate().then(() => ravelloRequest(opts));
       }
 
-      console.log('Unhandled error:', err.message);
       throw err;
     })
-  ));
 
-};
+  ))
+
+);
 
 module.exports = request;
