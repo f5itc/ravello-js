@@ -1,11 +1,47 @@
 // src/errors
 
-const handleError = module.exports.handleError = (res, responseData) => {
-  if (!res.statusCode.toString().startsWith('2')) {
-    const apiError = new Error();
-    apiError.message = res.statusMessage;
-    apiError.code = res.statusCode;
-    apiError.data = responseData;
-    return apiError;
+// TODO: test for presence of configuration errors in app JSON
+const hasError = (res, responseData) => (
+  res.headers['error-code'] || !res.statusCode.toString().startsWith('2')
+);
+
+function RavelloError({ res, responseData }, message, fileName, lineNumber) {
+  const err = new Error(message, fileName, lineNumber);
+
+  if (Object.setPrototypeOf && Object.getPrototypeOf) {
+    Object.setPrototypeOf(err, Object.getPrototypeOf(this));
+  } else {
+    err.__proto__ = this.proto;
   }
-};
+
+  if (Error.captureStackTrace) {
+    Error.captureStackTrace(err, RavelloError);
+  }
+
+  // If error-code / error-message headers exist
+  if (res && res.headers && res.headers['error-code'] && res.headers['error-message']) {
+    err.code = res.headers['error-code'];
+    err.message = res.headers['error-message'];
+  }
+
+  // Otherwise, use HTTP status code
+  else {
+    err.code = res.statusCode;
+    err.message = res.statusMessage;
+  }
+
+  // If responseData exists
+  if (responseData) {
+    err.data = responseData;
+  }
+
+  return err;
+}
+
+if (Object.setPrototypeOf) {
+  Object.setPrototypeOf(RavelloError, Error);
+} else {
+  RavelloError.__proto__ = Error;
+}
+
+module.exports = { hasError, RavelloError };
