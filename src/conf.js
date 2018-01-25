@@ -7,10 +7,17 @@ const baseLogger = (response) => {
 }
 
 const conf = {
-  Promise: Promise,
-  Logger: baseLogger
+  Promise:     Promise,
+  Logger:      baseLogger,
+  credentials: {
+    domain:   null,
+    password: null,
+    username: null,
+  },
 };
 
 module.exports.conf = conf;
 
-module.exports.configure = (newConf) => Object.assign(conf, newConf);
+module.exports.configure = (newConf) => {
+  Object.assign(conf, newConf);
+}
