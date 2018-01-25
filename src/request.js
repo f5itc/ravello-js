@@ -10,9 +10,6 @@ const hasError = require('./errors').hasError;
 const API_HOST = 'cloud.ravellosystems.com';
 const API_PATH = '/api/v1';
 
-const DOMAIN   = process.env.RAVELLO_DOMAIN;
-const USERNAME = process.env.RAVELLO_USERNAME;
-const PASSWORD = process.env.RAVELLO_PASSWORD;
 const DEBUG    = process.env.RAVELLO_DEV_MODE_ENABLED;
 
 const baseHeaders = {
@@ -20,8 +17,8 @@ const baseHeaders = {
   Accept: 'application/json',
 };
 
-const makeAuthHeader = (domain, user, pass) => ({
-  Authorization: 'Basic: ' + new Buffer(`${domain}/${user}:${pass}`).toString('base64'),
+const makeAuthHeader = ({ domain, username, password }) => ({
+  Authorization: 'Basic: ' + new Buffer(`${domain}/${username}:${password}`).toString('base64'),
 });
 
 let cookie;
@@ -88,13 +85,17 @@ const ravelloRequest = ({ body, headers={}, method, path }) => new conf.Promise(
   req.end();
 });
 
-const authenticate = () => (
-  ravelloRequest({
-    headers: makeAuthHeader(DOMAIN, USERNAME, PASSWORD),
+const authenticate = () => {
+  if (!conf.credentials || !conf.credentials.domain || !conf.credentials.password || !conf.credentials.username) {
+    throw new Error('Ravello credentials (username, password, and domain) are required to make authentication request.');
+  };
+
+  return ravelloRequest({
+    headers: makeAuthHeader(conf.credentials),
     method:  'POST',
     path:    '/login',
   })
-);
+};
 
 const checkAuthentication = () => new conf.Promise((resolve, reject) => {
   if (cookie) { return resolve(true); }
