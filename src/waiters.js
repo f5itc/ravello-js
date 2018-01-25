@@ -18,7 +18,12 @@ const waitFor = ({ method, methodArgs, maxTries=5, retryInterval=15, targetName,
             return resolve(response);
           }
 
-          console.log(`${targetName} ${targetId} is in condition ${attr} [ Attempt # ${i} ]`);
+          conf.Logger({
+            level: 'INFO',
+            type: 'waiter',
+            message: `${targetName} ${targetId} is in condition ${attr} [ Attempt # ${i} ]`
+          });
+
           throw new Error(`Retry #${attempt}`);
         })
         .catch((err) => {
