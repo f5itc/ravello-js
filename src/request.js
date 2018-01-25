@@ -17,9 +17,17 @@ const baseHeaders = {
   Accept: 'application/json',
 };
 
-const makeAuthHeader = ({ domain, username, password }) => ({
-  Authorization: 'Basic: ' + new Buffer(`${domain}/${username}:${password}`).toString('base64'),
-});
+const makeAuthHeader = (credentials) => {
+  if (!credentials || !credentials.domain || !credentials.password || !credentials.username) {
+    throw new Error('Ravello credentials (username, password, and domain) are required to make authentication request.');
+  };
+
+  const { domain, username, password } = credentials;
+
+  return {
+    Authorization: 'Basic: ' + new Buffer(`${domain}/${username}:${password}`).toString('base64'),
+  }
+};
 
 let cookie;
 
@@ -85,17 +93,13 @@ const ravelloRequest = ({ body, headers={}, method, path }) => new conf.Promise(
   req.end();
 });
 
-const authenticate = () => {
-  if (!conf.credentials || !conf.credentials.domain || !conf.credentials.password || !conf.credentials.username) {
-    throw new Error('Ravello credentials (username, password, and domain) are required to make authentication request.');
-  };
-
-  return ravelloRequest({
+const authenticate = () => (
+  ravelloRequest({
     headers: makeAuthHeader(conf.credentials),
     method:  'POST',
     path:    '/login',
   })
-};
+);
 
 const checkAuthentication = () => new conf.Promise((resolve, reject) => {
   if (cookie) { return resolve(true); }
