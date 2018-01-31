@@ -20,7 +20,7 @@ function RavelloError({ res, responseData }, message, fileName, lineNumber) {
 
   // If error-code / error-message headers exist
   if (res && res.headers && res.headers['error-code'] && res.headers['error-message']) {
-    err.code = res.headers['error-code'];
+    err.code = parseInt(res.headers['error-code'], 10);
     err.message = res.headers['error-message'];
   }
 
