@@ -15,7 +15,7 @@ const DEBUG    = process.env.RAVELLO_DEV_MODE_ENABLED;
 // Ravello API returns numbers in its JSON responses which are larger than Number.MAX_SAFE_INTEGER,
 // and this is one of only a couple approaches which will maintain data integrity of resource IDs.
 const parseJSON = (str) => (
-  JSON.parse(str.replace(/([\[:])?(\d{16,})([,\}\]])/g, "$1\"$2\"$3"));
+  JSON.parse(str.replace(/([\[:])?(\d{16,})([,\}\]])/g, "$1\"$2\"$3"))
 );
 
 const baseHeaders = {
