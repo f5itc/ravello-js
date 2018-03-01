@@ -67,6 +67,7 @@ const waitForImageState = module.exports.waitForImageState = (imageId, expectedV
     expectedValue,
     method:          getImage,
     methodArgs:      { imageId },
+    maxTries:        40,
     targetAttribute: 'loadingStatus',
     targetId:        imageId,
     targetName:      'Image',
