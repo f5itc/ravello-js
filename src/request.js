@@ -23,6 +23,8 @@ const baseHeaders = {
   Accept: 'application/json',
 };
 
+const pause = (duration) => new Promise(res => setTimeout(res, duration));
+
 const makeAuthHeader = (credentials) => {
   if (!credentials || !credentials.domain || !credentials.password || !credentials.username) {
     throw new Error('Ravello credentials (username, password, and domain) are required to make authentication request.');
@@ -37,7 +39,7 @@ const makeAuthHeader = (credentials) => {
 
 let cookie;
 
-const ravelloRequest = ({ body, headers={}, method, path }) => new conf.Promise((resolve, reject) => {
+const ravelloRequest = ({ retries = 10, delay = 500, body, headers={}, method, path }) => new conf.Promise((resolve, reject) => {
   if (typeof path === 'function') {
     if (typeof body !== 'object') { throw new Error('Body must be an object'); }
     path = path(body);
@@ -61,6 +63,11 @@ const ravelloRequest = ({ body, headers={}, method, path }) => new conf.Promise(
 
     res.on('end', () => {
       if (res.headers['set-cookie']) { cookie = res.headers['set-cookie'] }
+
+      if (res.statusCode === 429 && retries > 0) {
+        return pause(delay).then(() =>
+          ravelloRequest({ retries: retries - 1, delay: delay * 2, body, headers, method, path }))
+      }
 
       if (responseData.length > 0) {
         try {
@@ -112,7 +119,6 @@ const checkAuthentication = () => new conf.Promise((resolve, reject) => {
   return resolve(authenticate());
 });
 
-// TODO: add retry / backoff for retryable errors
 const request = (opts) => (
 
   // Ensure we have authentication
@@ -120,7 +126,6 @@ const request = (opts) => (
 
     // Execute request
     ravelloRequest(opts).catch((err) => {
-
 
       // If unauthorized error, attempt to re-authenticate
       if (err.code === 401) {
