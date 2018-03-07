@@ -994,7 +994,7 @@ module.exports.getVMState = {
   path:   ({ appId, vmId }) => `/applications/${appId}/vms/${vmId}/state;deployment`,
 };
 
-module.exports.getVMVMCURL = {
+module.exports.getVMVNCURL = {
   method: GET,
   path:   ({ appId, vmId }) => `/applications/${appId}/vms/${vmId}/vncUrl`,
 };
