@@ -45,7 +45,7 @@ const waitForVMState = module.exports.waitForVMState = (appId, vmId, expectedVal
     expectedValue,
     method:     getVMState,
     methodArgs: { appId, vmId },
-    maxTries:   40,
+    maxTries:   120,
     targetId:   vmId,
     targetName: 'VM',
   })
@@ -67,7 +67,7 @@ const waitForImageState = module.exports.waitForImageState = (imageId, expectedV
     expectedValue,
     method:          getImage,
     methodArgs:      { imageId },
-    maxTries:        40,
+    maxTries:        120,
     targetAttribute: 'loadingStatus',
     targetId:        imageId,
     targetName:      'Image',
