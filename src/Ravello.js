@@ -1,6 +1,7 @@
 // src/Ravello
 
 const methods = require('./methods');
+const pricing = require('./pricing');
 const request = require('./request');
 const waiters = require('./waiters');
 const constants = require('./constants');
@@ -13,6 +14,6 @@ const builtMethods = {};
 
 Object.keys(methods).forEach((key) => { builtMethods[key] = composeMethod(methods[key]); });
 
-const Ravello = Object.assign({ configure }, builtMethods, waiters, constants);
+const Ravello = Object.assign({ configure }, builtMethods, pricing, waiters, constants);
 
 module.exports = Ravello;

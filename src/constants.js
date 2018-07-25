@@ -53,3 +53,16 @@ const loadingStatuses = module.exports.loadingStatuses = {
   UNKNOWN:         'UNKNOWN',
   UPLOADING:       'UPLOADING',
 };
+
+const pricing = module.exports.pricing = {
+  R1:                   'R1',
+  R1_vCPU:              2,
+  R1_GB:                4,
+  R1_COST:              0.204,
+  R2:                   'R2',
+  R2_vCPU:              2,
+  R2_GB:                8,
+  R2_COST:              0.3825,
+  GB_VOLUME_STORAGE:    0.0002812,
+  COMPUTE_MINIMUM_COST: 0.425,
+}
