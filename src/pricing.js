@@ -10,18 +10,17 @@ const {
   R2, R2_COST, R2_GB,
 } = pricing;
 
-const {
-  R1_COST,
-  R2_COST,
-} = conf.pricing;
-
-const estimateRavelloDeploymentCost = module.exports.estimateRavelloDeploymentCost = ({ cpu, disk, memory }) => {
+const estimateRavelloDeploymentCost = module.exports.estimateRavelloDeploymentCost = ({ cpu, disk, memory }, customPricing) => {
   const rDist = estimateRavelloComputeDistribution({ cpu, memory });
 
-  let computeCost = (rDist[R1] * R1_COST) + (rDist[R2] * R2_COST);
+  let r1Cost = customPricing && customPricing['R1_COST'] ? customPricing['R1_COST'] : R1_COST;
+  let r2Cost = customPricing && customPricing['R2_COST'] ? customPricing['R2_COST'] : R2_COST;
+  let volumeStorageCost = customPricing && customPricing['GB_VOLUME_STORAGE'] ? customPricing['GB_VOLUME_STORAGE'] : GB_VOLUME_STORAGE;
+
+  let computeCost = (rDist[R1] * r1Cost) + (rDist[R2] * r2Cost);
   if (computeCost < COMPUTE_MINIMUM_COST) { computeCost = COMPUTE_MINIMUM_COST; }
 
-  return computeCost + (disk * GB_VOLUME_STORAGE);
+  return computeCost + (disk * volumeStorageCost);
 }
 
 const estimateRavelloComputeDistribution = module.exports.estimateRavelloComputeDistribution = ({ cpu, memory }) => {
