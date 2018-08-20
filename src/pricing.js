@@ -1,4 +1,5 @@
 // src/pricing
+const solver = require('javascript-lp-solver');
 
 const conf = require('./conf').conf;
 const { pricing } = require('./constants');
@@ -6,21 +7,41 @@ const { pricing } = require('./constants');
 const {
   GB_VOLUME_STORAGE,
   COMPUTE_MINIMUM_COST,
-  R1, R1_COST, R1_GB,
-  R2, R2_COST, R2_GB,
+  R1, R1_COST, R1_GB, R1_vCPU,
+  R2, R2_COST, R2_GB, R2_vCPU,
 } = pricing;
 
 const estimateRavelloDeploymentCost = module.exports.estimateRavelloDeploymentCost = ({ cpu, disk, memory }, customPricing) => {
-  const rDist = estimateRavelloComputeDistribution({ cpu, memory });
 
-  let r1Cost = customPricing && customPricing['R1_COST'] ? customPricing['R1_COST'] : R1_COST;
-  let r2Cost = customPricing && customPricing['R2_COST'] ? customPricing['R2_COST'] : R2_COST;
-  let volumeStorageCost = customPricing && customPricing['GB_VOLUME_STORAGE'] ? customPricing['GB_VOLUME_STORAGE'] : GB_VOLUME_STORAGE;
+  const r1Cost = customPricing && customPricing['R1_COST'] ? customPricing['R1_COST'] : R1_COST;
+  const r2Cost = customPricing && customPricing['R2_COST'] ? customPricing['R2_COST'] : R2_COST;
+  const volumeStorageCost = customPricing && customPricing['GB_VOLUME_STORAGE'] ? customPricing['GB_VOLUME_STORAGE'] : GB_VOLUME_STORAGE;
+  const computeMinimum = customPricing && customPricing['COMPUTE_MINIMUM_COST'] ? customPricing['COMPUTE_MINIMUM_COST'] : COMPUTE_MINIMUM_COST;
 
-  let computeCost = (rDist[R1] * r1Cost) + (rDist[R2] * r2Cost);
+  const diskCost = (disk * volumeStorageCost);
+
+  if (cpu < 1) { return diskCost; }
+
+  const solverModel = {
+    'optimize': 'cost',
+    'opType':   'min',
+    'constraints': {
+        'vCPU': { 'min': cpu },
+        'GB':   { 'min': memory },
+      },
+    'variables': {
+      [ R1 ]: { cost: r1Cost, GB: R1_GB, vCPU: R1_vCPU },
+      [ R2 ]: { cost: r2Cost, GB: R2_GB, vCPU: R2_vCPU },
+    },
+    ints: { [ R1 ]: 1, [ R2 ]: 1 },
+  };
+
+  const rDist = solver.Solve(solverModel);
+
+  let computeCost = (rDist[R1] ? rDist[R1] * r1Cost : 0) + (rDist[R2] ? rDist[R2] * r2Cost : 0);
   if (computeCost < COMPUTE_MINIMUM_COST) { computeCost = COMPUTE_MINIMUM_COST; }
 
-  return computeCost + (disk * volumeStorageCost);
+  return computeCost + diskCost
 }
 
 const estimateRavelloComputeDistribution = module.exports.estimateRavelloComputeDistribution = ({ cpu, memory }) => {

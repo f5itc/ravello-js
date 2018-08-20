@@ -20,8 +20,10 @@
   },
   "homepage": "https://github.com/f5itc/ravello-js#readme",
   "devDependencies": {
-    "jest": "^21.2.1",
-    "nock": "^9.1.4"
+    "jest": "^23.5.0",
+    "nock": "^9.6.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "javascript-lp-solver": "^0.4.5"
+  }
 }
