@@ -16,7 +16,7 @@ const estimateRavelloDeploymentCost = module.exports.estimateRavelloDeploymentCo
   const r1Cost = customPricing && customPricing['R1_COST'] ? customPricing['R1_COST'] : R1_COST;
   const r2Cost = customPricing && customPricing['R2_COST'] ? customPricing['R2_COST'] : R2_COST;
   const volumeStorageCost = customPricing && customPricing['GB_VOLUME_STORAGE'] ? customPricing['GB_VOLUME_STORAGE'] : GB_VOLUME_STORAGE;
-  const computeMinimum = customPricing && customPricing['COMPUTE_MINIMUM_COST'] ? customPricing['COMPUTE_MINIMUM_COST'] : COMPUTE_MINIMUM_COST;
+  const computeMinimumCost = customPricing && customPricing['COMPUTE_MINIMUM_COST'] ? customPricing['COMPUTE_MINIMUM_COST'] : COMPUTE_MINIMUM_COST;
 
   const diskCost = (disk * volumeStorageCost);
 
@@ -39,7 +39,7 @@ const estimateRavelloDeploymentCost = module.exports.estimateRavelloDeploymentCo
   const rDist = solver.Solve(solverModel);
 
   let computeCost = (rDist[R1] ? rDist[R1] * r1Cost : 0) + (rDist[R2] ? rDist[R2] * r2Cost : 0);
-  if (computeCost < COMPUTE_MINIMUM_COST) { computeCost = COMPUTE_MINIMUM_COST; }
+  if (computeCost < computeMinimumCost) { computeCost = computeMinimumCost; }
 
   return computeCost + diskCost
 }
