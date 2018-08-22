@@ -1,6 +1,6 @@
 {
   "name": "ravello-js",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Javascript bindings for Ravello API",
   "main": "index.js",
   "scripts": {
