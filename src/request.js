@@ -64,7 +64,8 @@ const ravelloRequest = ({ retries = 10, delay = 500, body, headers={}, method, p
     res.on('end', () => {
       if (res.headers['set-cookie']) { cookie = res.headers['set-cookie'] }
 
-      if (res.statusCode === 429 && retries > 0) {
+      if ((res.statusCode === 429 && retries > 0) ||
+          (conf.retryOnServiceUnavailable && res.statusCode === 503 && retries > 0)) {
         return pause(delay).then(() =>
           ravelloRequest({ retries: retries - 1, delay: delay * 2, body, headers, method, path }))
       }
