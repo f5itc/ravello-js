@@ -14,6 +14,7 @@ const conf = {
     password: null,
     username: null,
   },
+  retryOnServiceUnavailable: false,
 };
 
 module.exports.conf = conf;
