@@ -4,39 +4,60 @@ const request = require('./request');
 const { vmStates, loadingStatuses } = require('./constants');
 const { getVMState, getImage, isApplicationPublished } = require('./methods');
 
+const invalidResourceStates = {
+  [ vmStates.STARTED ]: vmStates.STOPPED,
+  [ vmStates.STOPPED ]: vmStates.STARTED,
+};
+
 const composeMethod = ({ method, path }) => (body) => request({ path, method, body });
 
 const waitFor = ({ method, methodArgs, maxTries=5, retryInterval=15, targetName, targetId, targetAttribute, expectedValue }) => {
-
   return new conf.Promise((resolve, reject) => {
-    const retry = (i) => {
-      composeMethod(method)(methodArgs)
-        .then((response) => {
-          const attr = targetAttribute ? response[targetAttribute] : response;
+    const retry = (i) => (
+      composeMethod(method)(methodArgs).then((response) => {
+        const attr = targetAttribute ? response[targetAttribute] : response;
 
-          if (attr === expectedValue) {
-            return resolve(response);
-          }
+        if (attr === expectedValue) {
+          return resolve(response);
+        }
 
+        // If the resource won't ever reach the expected state, throw an error
+        if (invalidResourceStates[expectedValue] && attr === invalidResourceStates[expectedValue]) {
+          const err = new Error(`The resource is not in a valid state to reach ${expectedValue}. Current state: ${attr}`);
+          err.code = 'ResourceInvalidStateError';
+          err.state = attr;
+          throw err;
+        }
+
+        conf.Logger({
+          level: 'INFO',
+          type: 'waiter',
+          message: `${targetName} ${targetId} is in condition ${attr}, waiting for condition ${expectedValue} [ Attempt # ${i} ]`
+        });
+
+        throw new Error(`Retry #${i}`);
+      })
+      .catch((err) => {
+
+        if (err.message) {
           conf.Logger({
             level: 'INFO',
             type: 'waiter',
-            message: `${targetName} ${targetId} is in condition ${attr} [ Attempt # ${i} ]`
+            message: err.message
           });
+        }
 
-          throw new Error(`Retry #${attempt}`);
-        })
-        .catch((err) => {
+        if (err.code === 'ResourceInvalidStateError') { return reject(err); }
 
-          if (i >= maxTries) {
-            return reject(`Maximum tries exceeded waiting for ${targetName} ${targetId} to reach ${expectedValue}`);
-          }
+        if (i >= maxTries) {
+          return reject(`Maximum tries exceeded waiting for ${targetName} ${targetId} to reach ${expectedValue}`);
+        }
 
-          setTimeout(() => retry(i + 1), retryInterval * 1000);
-        });
-    };
+        return setTimeout(() => retry(i + 1), retryInterval * 1000);
+      })
+    );
 
-    retry(1);
+    return retry(1);
   });
 };
 
