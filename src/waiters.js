@@ -11,7 +11,7 @@ const invalidResourceStates = {
 
 const composeMethod = ({ method, path }) => (body) => request({ path, method, body });
 
-const waitFor = ({ method, methodArgs, maxTries=5, retryInterval=15, targetName, targetId, targetAttribute, expectedValue }) => {
+const waitFor = ({ method, methodArgs, maxTries=5, retryInterval=15, targetName, targetId, targetAttribute, expectedValue, failureValue }) => {
   return new conf.Promise((resolve, reject) => {
     const retry = (i) => (
       composeMethod(method)(methodArgs).then((response) => {
@@ -19,6 +19,12 @@ const waitFor = ({ method, methodArgs, maxTries=5, retryInterval=15, targetName,
 
         if (attr === expectedValue) {
           return resolve(response);
+        }
+
+        if (attr === failureValue) {
+          let error = new Error('Expected failure value reached.');
+          error.code = 'ExpectedFailure';
+          throw error;
         }
 
         // If the resource won't ever reach the expected state, throw an error
@@ -47,7 +53,7 @@ const waitFor = ({ method, methodArgs, maxTries=5, retryInterval=15, targetName,
           });
         }
 
-        if (err.code === 'ResourceInvalidStateError') { return reject(err); }
+        if (err.code === 'ResourceInvalidStateError' || err.code === 'ExpectedFailure') { return reject(err); }
 
         if (i >= maxTries) {
           return reject(`Maximum tries exceeded waiting for ${targetName} ${targetId} to reach ${expectedValue}`);
@@ -64,6 +70,7 @@ const waitFor = ({ method, methodArgs, maxTries=5, retryInterval=15, targetName,
 const waitForVMState = module.exports.waitForVMState = (appId, vmId, expectedValue) => (
   waitFor({
     expectedValue,
+    failureValue: vmStates.ERROR,
     method:     getVMState,
     methodArgs: { appId, vmId },
     maxTries:   120,
