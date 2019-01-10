@@ -2,7 +2,7 @@
 const conf  = require('./conf').conf;
 const request = require('./request');
 const { vmStates, loadingStatuses } = require('./constants');
-const { getVMState, getImage, isApplicationPublished } = require('./methods');
+const { getVM, getVMState, getImage, isApplicationPublished } = require('./methods');
 
 const invalidResourceStates = {
   [ vmStates.STARTED ]: vmStates.STOPPED,
@@ -76,6 +76,18 @@ const waitForVMState = module.exports.waitForVMState = (appId, vmId, expectedVal
     maxTries:   120,
     targetId:   vmId,
     targetName: 'VM',
+  })
+);
+
+const waitForSnapshotState = module.exports.waitForSnapshotState = (appId, vmId, expectedValue) => (
+  waitFor({
+    expectedValue,
+    method:          getVM,
+    methodArgs:      { appId, vmId },
+    maxTries:        120,
+    targetId:        vmId,
+    targetName:      'Snapshot',
+    targetAttribute: 'loadingStatus',
   })
 );
 
