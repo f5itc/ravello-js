@@ -70,6 +70,11 @@ module.exports.getApplication = {
   path:   ({ appId }) => `/applications/${appId}`,
 };
 
+module.exports.getApplicationDeployment = {
+  method: GET,
+  path:   ({ appId }) => `/applications/${appId};deployment`,
+};
+
 module.exports.getApplicationBillingDetail = {
   method: GET,
   path:   ({ appId }) => `/applications/${appId}/billing`,
@@ -633,6 +638,11 @@ module.exports.updateNetworkInterface = {
 module.exports.searchNotifications = {
   method: POST,
   path:   '/notifications/search',
+};
+
+module.exports.pageNotifications = {
+  method: POST,
+  path:   '/notifications/page',
 };
 
 // Organizations

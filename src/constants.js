@@ -66,3 +66,7 @@ const pricing = module.exports.pricing = {
   GB_VOLUME_STORAGE:    0.0002812,
   COMPUTE_MINIMUM_COST: 0.425,
 }
+
+const notificationEventTypes = module.exports.notificationEventTypes = {
+  VM_FINISHED_SNAPSHOTTING: 'VM_FINISHED_SNAPSHOTTING',
+};
