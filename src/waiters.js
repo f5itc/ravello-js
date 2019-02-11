@@ -34,7 +34,7 @@ const waitFor = ({ expectedValue, failureValue, maxTries=5, method, methodArgs, 
         }
 
         // If the resource won't ever reach the expected state, throw an error
-        if (invalidResourceStates[value] && value === invalidResourceStates[value]) {
+        if (invalidResourceStates[expectedValue] && invalidResourceStates[expectedValue] === value) {
           const err = new Error(`The resource is not in a valid state to reach ${expectedValue}. Current state: ${value}`);
           err.code = 'ResourceInvalidStateError';
           err.state = value;
