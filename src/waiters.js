@@ -168,7 +168,7 @@ const waitForNotification = module.exports.waitForNotification = (appId, targetI
     targetId:    targetId,
     targetName:  'Entity',
     targetValue: (res) => {
-      const matchingNotifications = res.content.filter((n) => n.eventProperties.find((e) => e.value === targetId) !== undefined);
+      const matchingNotifications = res.content.filter((n) => n.eventProperties.find((e) => e.value == targetId) !== undefined);
 
       if (matchingNotifications.length) { return eventType; }
 
