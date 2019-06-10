@@ -1,5 +1,5 @@
 const baseDetails = {
-  creationTime: 1000000000000,
+  creationTime: "1000000000000",
   designDiffersFromDeployment:false,
   published: false,
   version: 1,
@@ -8,17 +8,17 @@ const baseDetails = {
 const owner = {
   owner: 'WOO API',
   ownerDetails: {  
-    userId: 10000000,
+    userId: "10000000",
     name: "WOO API",
     deleted: false
   },
 };
 
 const costBucket = {
-  costBucketId: 10000000,
+  costBucketId: "10000000",
   costBucket: {
-    id: 10000000,
-    creationTime: 1000000000000,
+    id: "10000000",
+    creationTime: "1000000000000",
     name: "Organization",
     deleted: false
   },
@@ -28,9 +28,9 @@ const baseDesign = {
   design: {  
     network: {
       subnets: [{  
-        id: 1000000000000000000,
+        id: "1000000000000000000",
         dhcp: {  
-          id: 1000000000000000000,
+          id: "1000000000000000000",
           ip:"10.0.0.1",
           active: true,
           ipRangeBegin: "10.0.0.1",
@@ -53,7 +53,7 @@ const baseDesign = {
 };
 
 module.exports.baseApplication = {  
-  id: 10000000,
+  id: "10000000",
   name: "Application",
   ...baseDetails,
   ...owner,
