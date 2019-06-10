@@ -9,6 +9,8 @@ const r = require('..');
 const basePath = '/applications';
 const appId = f.baseApplication.id;
 
+r.configure({ credentials: { domain: 'earth', password: 'password', username: 'human' } });
+
 beforeEach(() => {
   n.makeAuthorizationNock();
 });
@@ -106,7 +108,7 @@ test('get application deployment cost', () => {
   n.makeRavelloPOSTNock(`${basePath}/${appId};deployment/calcPrice`, payload, f.deploymentPrice);
 
   return r.getApplicationDeploymentCost(payload).then((response) => {
-    expect(response).toEqual(f.deploymentPrice);
+    expect(JSON.parse(response)).toEqual(f.deploymentPrice);
   });
 });
 
